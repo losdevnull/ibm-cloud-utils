@@ -11,6 +11,7 @@ creds=$(curl -s -u "${IAM_CLIENT_ID}:${IAM_CLIENT_SECRET}" -k -X POST --header "
 
 ims_token=$(echo $creds | jq -r '.ims_token')
 ims_user_id=$(echo $creds | jq -r '.ims_user_id')
+iam_access_token=$(echo $creds | jq -r '.access_token')
 
 # Get api key over xmlrpc
 curl -s -X POST -d "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -83,9 +84,10 @@ curl -s -X POST -d "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     </param>
   </params>
 </methodCall>" https://api.softlayer.com/xmlrpc/v3/SoftLayer_User_Customer > response.xml
-export SL_USERNAME=$(cat response.xml | xmllint --xpath '(//params/param/value/struct/member/value/string/text())[1]' -)
-export SL_API_KEY=$(cat response.xml | xmllint --xpath '(//params/param/value/struct/member/value/array/data/value/struct/member/value/string/text())[1]' -)
+SL_USERNAME=$(cat response.xml | xmllint --xpath '(//params/param/value/struct/member/value/string/text())[1]' -)
+SL_API_KEY=$(cat response.xml | xmllint --xpath '(//params/param/value/struct/member/value/array/data/value/struct/member/value/string/text())[1]' -)
 
+# echo "IAM_TOKEN: $iam_access_token"
 echo "SL_USERNAME: $SL_USERNAME"
 echo "SL_API_KEY: $SL_API_KEY"
 
